@@ -77,59 +77,45 @@ class TopicModelingWidget(QWidget):
 
 def read_doc(input_file_name):
     corpus = []
-
     with open(input_file_name, "rb") as f:
         temp_corpus = pickle.load(f)
     for page in temp_corpus:
         corpus += page
-
     return corpus
-
 
 def text_clean(docs):
     for doc in docs:
         doc = re.sub("[^ㄱ-ㅎㅏ-ㅣ가-힇 ]", "", doc)
-
     return docs
-
 
 def define_stopwords(path):
     SW = set()
-
     for i in string.punctuation:
         SW.add(i)
-
     with open(path) as f:
         for word in f:
             SW.add(word)
-
     return SW
-
 
 def text_tokenize(corpus):
     mecab = Mecab()
     token_corpus = []
-
     if w.ui.rb_noun.isChecked():
         for n in range(len(corpus)):
             token_text = mecab.nouns(corpus[n])
             token_text = [word for word in token_text if word not in SW]
             token_corpus.append(token_text)
-
     if w.ui.rb_morphs.isChecked():
         for n in range(len(corpus)):
             token_text = mecab.morphs(corpus[n])
             token_text = [word for word in token_text if word not in SW]
             token_corpus.append(token_text)
-
     if w.ui.rb_words.isChecked():
         for n in range(len(corpus)):
             token_text = corpus[n].split()
             token_text = [word for word in token_text if word not in SW]
             token_corpus.append(token_text)
-
     return token_corpus
-
 
 SW = define_stopwords("./data/stop-word.txt")
 
