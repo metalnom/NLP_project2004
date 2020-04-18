@@ -1,11 +1,9 @@
 from konlpy.tag import Mecab
-import numpy as np
 import string
 import re
 import warnings
 import pickle
 from gensim import corpora, models
-import matplotlib.pyplot as plt
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox, QTableWidgetItem
 
