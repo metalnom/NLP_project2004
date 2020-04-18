@@ -37,7 +37,7 @@ class CrawlingWidget(QWidget):
         with open("./data/naver_news_contents.pk", 'wb') as f:
             pickle.dump(contents, f)
         self.ui.ln_doccount.display(self.doc_count)
-        self.pop_message("수집 완료!!")
+        self.pop_message("Crawling Finished!!")
 
 
     def link_downloading(self):
