@@ -19,3 +19,23 @@
 ![](./images/TopicModeling_05.png)
 
 ![](./images/TopicModeling_06.png)
+
+
+
+### Sentiment Analysis
+
+#### Data Loading
+![](./images/SentimentAnalysis_01.png)
+
+![](./images/SentimentAnalysis_02.png)
+
+#### Cleaning & Tokenizing
+![](./images/SentimentAnalysis_03.png)
+
+#### Learning & Testing
+![](./images/SentimentAnalysis_04.png)
+
+#### Predict
+![](./images/SentimentAnalysis_05.png)
+
+![](./images/SentimentAnalysis_06.png)
