@@ -156,8 +156,9 @@ class SAWidget(QWidget):
         self.ui.le_test_acc.setText("{}".format(test_accuracy))
 
     def sentence_predict(self):
-        sentence = [self.text_tokenizing(self.text_cleaning(self.ui.le_sentence.text()))]
+        sentence = [self.list_to_str(self.text_tokenizing(self.text_cleaning(self.ui.le_sentence.text())))]
         predict_sen = self.classifier.predict(sentence)
+        print(sentence)
         if predict_sen[0] == "0":
             self.ui.le_result.setText("Negative")
         elif predict_sen[0] == "1":
