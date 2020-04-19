@@ -3,6 +3,11 @@ from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox, QTableWidgetItem
 import re
 from konlpy.tag import Mecab
 import os, json
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model import SGDClassifier
+from sklearn.svm import SVC
+import numpy as np
 
 
 class SAWidget(QWidget):
@@ -14,10 +19,13 @@ class SAWidget(QWidget):
         self.test_data = []
         self.train_path = ""
         self.test_path = ""
+
         self.ui = uic.loadUi("./SentimentAnalysis_UI.ui")
         self.ui.show()
         self.ui.btn_loading.clicked.connect(self.data_loading)
         self.ui.btn_tokenizing.clicked.connect(self.making_data)
+        self.ui.btn_learning.clicked.connect(self.learning)
+        self.ui.btn_predict.clicked.connect(self.sentence_predict)
 
     def data_loading(self):
         self.train_path = self.ui.le_train_file.text()
@@ -114,6 +122,48 @@ class SAWidget(QWidget):
         for i in range(row_max):
             self.ui.tbl_test_token.setItem(i, 0, QTableWidgetItem(", ".join(data[i][0])))
             self.ui.tbl_test_token.setItem(i, 1, QTableWidgetItem(data[i][1]))
+
+    def list_to_str(self, lst):
+        return " ".join(lst)
+
+    def learning(self):
+        train_x = [self.list_to_str(doc) for doc, _ in self.train_data]
+        test_x = [self.list_to_str(doc) for doc, _ in self.test_data]
+        train_y = [self.list_to_str(label) for _, label in self.train_data]
+        test_y = [self.list_to_str(label) for _, label in self.test_data]
+
+        if self.ui.rb_learner1.isChecked():
+            self.classifier = Pipeline([('vect', CountVectorizer()), ('clf', SGDClassifier(
+                loss='perceptron', penalty='l2', alpha=1e-4, random_state=42, max_iter=100))])
+        elif self.ui.rb_learner2.isChecked():
+            self.classifier = Pipeline([('vect', CountVectorizer()), ('clf', SVC(kernel='linear'))])
+        elif self.ui.rb_learner3.isChecked():
+            self.classifier = Pipeline([('vect', CountVectorizer()), ('clf', SVC(kernel='poly', degree=8))])
+        elif self.ui.rb_learner4.isChecked():
+            self.classifier = Pipeline([('vect', CountVectorizer()), ('clf', SVC(kernel='rbf'))])
+        elif self.ui.rb_learner5.isChecked():
+            self.classifier = Pipeline([('vect', CountVectorizer()), ('clf', SVC(kernel='sigmoid'))])
+
+        self.classifier.fit(train_x, train_y)
+        train_predict = self.classifier.predict(train_x)
+        train_accuracy = np.mean(train_predict == train_y)
+        test_predict = self.classifier.predict(test_x)
+        test_accuracy = np.mean(test_predict == test_y)
+
+        self.ui.le_n_train.setText(str(len(train_x)))
+        self.ui.le_n_test.setText(str(len(test_x)))
+        self.ui.le_train_acc.setText("{}".format(train_accuracy))
+        self.ui.le_test_acc.setText("{}".format(test_accuracy))
+
+    def sentence_predict(self):
+        sentence = [self.text_tokenizing(self.text_cleaning(self.ui.le_sentence.text()))]
+        predict_sen = self.classifier.predict(sentence)
+        if predict_sen[0] == "0":
+            self.ui.le_result.setText("Negative")
+        elif predict_sen[0] == "1":
+            self.ui.le_result.setText("Positive")
+        else:
+            self.ui.le_result.setText("ERROR")
 
 
 if __name__ == "__main__":
